@@ -11,27 +11,27 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   uint8_t axis_status = 0;
-  uint8_t axis_x = 0;
-  uint8_t axis_y = 0;
-  uint8_t axis_z = 0;
+  int8_t axis_x = 0;
+  int8_t axis_y = 0;
+  int8_t axis_z = 0;
 
   do{
     axis_status = high_g_read(HIGH_G_ACCEL_STATUS_REG);
 
     if(axis_status & HIGH_G_Z_DA)
-      axis_z = high_g_read(HIGH_G_ACCEL_CTRL_REG1);
+      axis_z = (int8_t) high_g_read(HIGH_G_ACCEL_OUT_Z);
     if(axis_status & HIGH_G_Y_DA)
-      axis_y = high_g_read(HIGH_G_ACCEL_OUT_Y);
+      axis_y = (int8_t) high_g_read(HIGH_G_ACCEL_OUT_Y);
     if(axis_status & HIGH_G_X_DA)
-      axis_x = high_g_read(HIGH_G_ACCEL_OUT_X);
-  }while(axis_x & axis_y & axis_z);
+      axis_x = (int8_t) high_g_read(HIGH_G_ACCEL_OUT_X);
+  }while(axis_x * axis_y * axis_z);
   
   Serial.print("X: ");
-  Serial.print(axis_x);
+  Serial.print( axis_x);
   Serial.print("\tY: ");
-  Serial.print(axis_x);
+  Serial.print( axis_y);
   Serial.print("\tZ: ");
-  Serial.println(axis_x);
+  Serial.println( axis_z);
 
   delay(15);
 }
