@@ -1,0 +1,17 @@
+The files in this archive demosntrate the usage of MOD-MPU6050 under Arduino IDE.
+
+OLIMEXINO-328 was used during testing. Arduino IDE version 1.0.6 was used (under Windows 7 x64). For best results, keep the setup the same!
+
+How to use the example:
+
+1. Download and extract the archive with the example.
+
+2. Inside the main folder there are two folders and this text document.
+
+3. Navigate inside the "LIBRARIES" folder and copy the two folders ("I2Cdev" and "MPU6050") to the libraries folder of Arduino IDE. The path to it here was: <PATH_TO_EXTRACT_FOLDER>\arduino-1.0.6-windows\arduino-1.0.6\libraries
+
+4. Start Arduino IDE open the MPU6050_test.ino file from the folder "MPU6050_test" (located in the main folder of the archive). Compile and you are good to go.
+
+Refer to the comments in the MPU6050_test.ino for detailed information.
+
+04.12.2014
