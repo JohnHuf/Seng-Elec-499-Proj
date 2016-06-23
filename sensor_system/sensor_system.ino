@@ -1,14 +1,14 @@
 #include "blueduino_499_proj_init.h"
 
+
 void setup() {
   // put your setup code here, to run once:
   delay(1000);
   blueduino_init();
-  Serial.println("High G Test");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // Code Currently polls and prints out High G accelerometer
 
   uint8_t axis_status = 0;
   int8_t axis_x = 0;

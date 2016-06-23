@@ -2,19 +2,17 @@
 #define _BLUEDUINO_499_PROJ_INIT_H
 
 #include "high_g_accel.h"
+#include "MPU6050.h"
 
 #include <SPI.h>
-
+#include <Wire.h>
 
 #define USB_BAUD_RATE 9600
 
-/** Pin Initialization function
-*		Sets up pins to:
-*			SPI Port on pins 9-11 & 26
-*			I2C port on pins 18&19
-*			BLE module on pins 13, 20, 21
-*			USB on pins 3&4
-*		Remaining programmable pins to high impedance
+MPU6050 _lowG_Gyro;
+
+/** 
+ *  Initialization function
 **/
 void blueduino_init(){
 	//SPI initialization
@@ -25,6 +23,16 @@ void blueduino_init(){
 	
 	//High G accelerometer init
 	high_g_init();
+
+  /**
+   * Low G/Gyro Init
+   * Using MPU6050_test.ino as reference file for initalization procedure
+   **/
+  Wire.begin();
+  _lowG_Gyro.initialize();
+    //Test connection?
+  
+  
 	
 	//USB serial 
 	Serial.begin(USB_BAUD_RATE);
