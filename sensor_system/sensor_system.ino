@@ -1,37 +1,34 @@
 #include "blueduino_499_proj_init.h"
+#include "499_data_types.h"
 
+#define SENSOR_PERIOD_US 1000;
 
 void setup() {
-  // put your setup code here, to run once:
-  delay(1000);
   blueduino_init();
 }
 
 void loop() {
-  // Code Currently polls and prints out High G accelerometer
+  //Loop to poll and send sensor data via Bluetooth
 
-  uint8_t axis_status = 0;
-  int8_t axis_x = 0;
-  int8_t axis_y = 0;
-  int8_t axis_z = 0;
+  delay(1000);
+  //Sample time for loop beginning
+  unsigned long loop_begin_time = micros();
 
-  do{
-    axis_status = high_g_read(HIGH_G_ACCEL_STATUS_REG);
+  //allocate Message
+  bluetooth_msg bt_msg;
 
-    if(axis_status & HIGH_G_Z_DA)
-      axis_z = (int8_t) high_g_read(HIGH_G_ACCEL_OUT_Z);
-    if(axis_status & HIGH_G_Y_DA)
-      axis_y = (int8_t) high_g_read(HIGH_G_ACCEL_OUT_Y);
-    if(axis_status & HIGH_G_X_DA)
-      axis_x = (int8_t) high_g_read(HIGH_G_ACCEL_OUT_X);
-  }while(axis_x * axis_y * axis_z);
-  
-  Serial.print("X: ");
-  Serial.print( axis_x);
-  Serial.print("\tY: ");
-  Serial.print( axis_y);
-  Serial.print("\tZ: ");
-  Serial.println( axis_z);
+  //Poll Sensors
+  bt_msg.high_g_z = high_g_read(HIGH_G_ACCEL_OUT_Z);
+  bt_msg.high_g_y = high_g_read(HIGH_G_ACCEL_OUT_Y);
+  bt_msg.high_g_x = high_g_read(HIGH_G_ACCEL_OUT_X);
 
-  delay(15);
+  _lowG_Gyro.getMotion6(&bt_msg.low_g_x, &bt_msg.low_g_y, &bt_msg.low_g_z, &bt_msg.gyro_x, &bt_msg.gyro_y, &bt_msg.gyro_z);
+
+  //Align axis
+  // *****FIX ME*****
+
+  Serial.println("DONE!");
+
+  Serial.print("TIME USED:  ");
+  Serial.println((micros()-loop_begin_time));
 }

@@ -8,6 +8,7 @@
 #include <Wire.h>
 
 #define USB_BAUD_RATE 9600
+#define LOW_G_1KHz    7
 
 MPU6050 _lowG_Gyro;
 
@@ -30,9 +31,11 @@ void blueduino_init(){
    **/
   Wire.begin();
   _lowG_Gyro.initialize();
-    //Test connection?
-  
-  
+  //set sample rate to 1 KHz (Same as High G)
+  _lowG_Gyro.setRate(LOW_G_1KHz);
+  //Set G range to 16
+  _lowG_Gyro.setFullScaleAccelRange(MPU6050_ACCEL_FS_16);
+  //Leave Gyro for now? 250
 	
 	//USB serial 
 	Serial.begin(USB_BAUD_RATE);

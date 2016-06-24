@@ -8,7 +8,7 @@ void 	high_g_init(){
    *  Initialize Ctrl Reg 1
    *  Currently sets pwrLvl normal, data rate 50 Hz and all Axis
    */
-	high_g_write(HIGH_G_ACCEL_CTRL_REG1, HIGH_G_PWR_NRML | HIGH_G_ODR_50 | HIGH_G_AXIS_ALL);
+	high_g_write(HIGH_G_ACCEL_CTRL_REG1, HIGH_G_PWR_NRML | HIGH_G_ODR_1000 | HIGH_G_AXIS_ALL);
 }
 
 void 	high_g_write(uint8_t addr, uint8_t data){
