@@ -1,7 +1,7 @@
 #ifndef _TASKS_499_H
 #define _TASKS_499_H
 
-#include <Arduino_FreeRTOS.h>
+#include "FreeRTOS/Arduino_FreeRTOS.h"
 
 #include "blueduino_499_proj_init.h"
 #include "499_data_types.h"
@@ -37,6 +37,7 @@ void HighG_poll_task( void *pvParameters ){
 
 void LowG_poll_task( void *pvParameters ){
 	for(;;){
+    Serial.println("Low G start");
 		int16_t accX, accY, accZ, gyroX, gyroY, gyroZ;
 		_lowG_Gyro.getMotion6(&accX, &accY, &accZ, &gyroX, &gyroY, &gyroZ);
 	
@@ -54,7 +55,7 @@ void LowG_poll_task( void *pvParameters ){
 		//Lock mutex to prevent preemption wrecking fifo?
 		if(!glb_msg_fifo_ptr->push(temp)){}
 			//Handle errors?
-	  
+	  Serial.println("Low G end");
 		vTaskDelay(1);
 	}
 }
@@ -63,7 +64,7 @@ void BT_send_task( void *pvParamters ){
 	for(;;){
 		AB_BLE bluetooth(&Serial1);
 		
-		vTaskDelay();
+		vTaskDelay(1);
 	}
 }
 
