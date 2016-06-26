@@ -27,8 +27,10 @@ void HighG_poll_task( void *pvParameters ){
 		//Lock mutex to prevent preemption wrecking fifo?
 		if(!glb_msg_fifo_ptr->push(tempMsg)){}
 			//Handle errors?
-	  
-		// block call?
+		
+		long time = millis();
+		vTaskDelay(1);
+		Serial.println( millis()- time);
 	}
 }
 
@@ -52,7 +54,7 @@ void LowG_poll_task( void *pvParameters ){
 		if(!glb_msg_fifo_ptr->push(temp)){}
 			//Handle errors?
 	  
-		//block call?
+		vTaskDelay(1);
 	}
 }
 
