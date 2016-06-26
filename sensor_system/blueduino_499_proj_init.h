@@ -4,20 +4,25 @@
 #include "high_g_accel.h"
 #include "MPU6050.h"
 #include "tasks_499.h"
+#include "499_data_types.h"
 
 #include <SPI.h>
 #include <Wire.h>
 
 #define USB_BAUD_RATE 9600
-#define LOW_G_1KHz    7
+#define LOW_G_1KHz   	7
+#define MSG_FIFO_SIZE	16
 
 MPU6050 _lowG_Gyro;
-
+BT_FIFO * glb_msg_fifo_ptr;
 
 /** 
  *  Initialization function
 **/
 void blueduino_init(){
+	//global variable init
+	glb_msg_fifo_ptr = new BT_FIFO(MSG_FIFO_SIZE);
+	
 	//SPI initialization
 	pinMode(SPI_CS, OUTPUT);
 	digitalWrite(SPI_CS, HIGH);
@@ -43,29 +48,11 @@ void blueduino_init(){
 	Serial.begin(USB_BAUD_RATE);
 
   //Task Initializations
-  xTaskCreate(
-    HighG_poll_task,
-    (const portCHAR *)"HIGH_G_POLL",
-    128,
-    NULL,
-    1,
-    NULL);
+  xTaskCreate(HighG_poll_task,(const portCHAR *)"HIGH_G_POLL",128,NULL,1,NULL);
 
-  xTaskCreate(
-    LowG_poll_task,
-    (const portCHAR *)"LOW_G_POLL",
-    128,
-    NULL,
-    3,
-    NULL);
+  xTaskCreate(LowG_poll_task,(const portCHAR *)"LOW_G_POLL",128, NULL,3, NULL);
 
-  xTaskCreate(
-    BT_send_task,
-    (const portCHAR *)"BT_MSG",
-    128,
-    NULL,
-    3,
-    NULL);
+  xTaskCreate( BT_send_task, (const portCHAR *)"BT_MSG",128, NULL, 3, NULL);
 }
 
 
