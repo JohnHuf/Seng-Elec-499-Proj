@@ -46,6 +46,7 @@ void blueduino_init(){
 	
 	//USB serial 
 	Serial.begin(USB_BAUD_RATE);
+	Serial1.begin(USB_BAUD_RATE);
 
   //Task Initializations
   xTaskCreate(HighG_poll_task,(const portCHAR *)"HIGH_G_POLL",128,NULL,1,NULL);

@@ -50,7 +50,7 @@ bool BT_FIFO::push(bluetooth_msg MSG){
 	}
 	
 	data[back] = MSG;
-	back++;
+	back = (back + 1)%size;
 	count++;
 	
 	return true;
@@ -65,7 +65,7 @@ bluetooth_msg BT_FIFO::pop(){
 	}
 	
 	bluetooth_msg temp = data[front];
-	front++;
+	front = (front + 1)%size;
 	count--;
 	
 	return temp;

@@ -11,13 +11,16 @@ extern BT_FIFO * glb_msg_fifo_ptr;
 extern MPU6050 _lowG_Gyro;
 
 void HighG_poll_task( void *pvParameters ){
+	bluetooth_msg tempMsg;
+	int8_t tempX, tempY, tempZ;
 	for(;;){
-		int8_t tempX, tempY, tempZ;
+		Serial.println("high g start");
+		
 		tempX = high_g_read(HIGH_G_ACCEL_OUT_Z);
 		tempY = high_g_read(HIGH_G_ACCEL_OUT_Y);
 		tempZ = high_g_read(HIGH_G_ACCEL_OUT_X);
 
-		bluetooth_msg tempMsg;
+		
 		tempMsg.time = (uint8_t) millis();
 		tempMsg.ctrl = HIGH_G_MSG;
 		tempMsg.high_g_x = tempX;
@@ -29,19 +32,20 @@ void HighG_poll_task( void *pvParameters ){
 		if(!glb_msg_fifo_ptr->push(tempMsg)){}
 			//Handle errors?
 		
-		long time = millis();
+		//Serial.println("high g end");
 		vTaskDelay(1);
-		Serial.println( millis()- time);
 	}
 }
 
 void LowG_poll_task( void *pvParameters ){
+	bluetooth_msg temp;
+	int16_t accX, accY, accZ, gyroX, gyroY, gyroZ;
 	for(;;){
-    Serial.println("Low G start");
-		int16_t accX, accY, accZ, gyroX, gyroY, gyroZ;
+		Serial.println("Low G start");
+		
 		_lowG_Gyro.getMotion6(&accX, &accY, &accZ, &gyroX, &gyroY, &gyroZ);
 	
-		bluetooth_msg temp;
+		
 		temp.time = (uint8_t) millis();
 		temp.ctrl = LOW_G_MSG;
 		temp.low_g_x = (int8_t) accX/2;
@@ -55,16 +59,41 @@ void LowG_poll_task( void *pvParameters ){
 		//Lock mutex to prevent preemption wrecking fifo?
 		if(!glb_msg_fifo_ptr->push(temp)){}
 			//Handle errors?
-	  Serial.println("Low G end");
-		vTaskDelay(1);
+		//Serial.println("Low G end");
+		vTaskDelay(6);
 	}
 }
 
 void BT_send_task( void *pvParamters ){
+	AB_BLE bluetooth(&Serial1);
+	unsigned char msgBuffer[12];
+	bluetooth_msg temp;
 	for(;;){
-		AB_BLE bluetooth(&Serial1);
 		
-		vTaskDelay(1);
+		Serial.println("BLE start");
+		temp = glb_msg_fifo_ptr->pop();
+		if(temp.time == 0 && temp.ctrl == 0){
+			//empty msg
+		}
+		else{
+			;
+			msgBuffer[0] = temp.time;
+			msgBuffer[1] = temp.ctrl;
+			msgBuffer[2] = temp.high_g_x;
+			msgBuffer[3] = temp.high_g_x;
+			msgBuffer[4] = temp.high_g_x;
+			msgBuffer[2+3] = temp.low_g_x;
+			msgBuffer[6] = temp.low_g_x;
+			msgBuffer[7] = temp.low_g_x;
+			msgBuffer[8] = temp.gyro_x;
+			msgBuffer[9] = temp.gyro_x;
+			msgBuffer[10] = temp.gyro_x;
+			msgBuffer[11] = 0x00;
+			bluetooth.write(msgBuffer, 12);
+		}	
+		
+		//Serial.println("BLE end");
+		vTaskDelay(10);
 	}
 }
 

@@ -20,9 +20,12 @@
 #define SENSOR_PERIOD_US 1000;
 
 void setup() {
+  delay(1000);
   blueduino_init();
+  delay(10000);
 
-  //scheduler gets automatically called
+  Serial.println("end init");
+  //vTaskStartScheduler();
 }
 
 void loop() {
