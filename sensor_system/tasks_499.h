@@ -5,6 +5,7 @@
 
 #include "blueduino_499_proj_init.h"
 #include "499_data_types.h"
+#include "AB_BLE.h"
 
 extern BT_FIFO * glb_msg_fifo_ptr;
 extern MPU6050 _lowG_Gyro;
@@ -59,7 +60,11 @@ void LowG_poll_task( void *pvParameters ){
 }
 
 void BT_send_task( void *pvParamters ){
-	
+	for(;;){
+		AB_BLE bluetooth(&Serial1);
+		
+		vTaskDelay();
+	}
 }
 
 #endif
