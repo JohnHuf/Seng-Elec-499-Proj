@@ -1,3 +1,19 @@
+#include <Arduino_FreeRTOS.h>
+#include <croutine.h>
+#include <event_groups.h>
+#include <FreeRTOSConfig.h>
+#include <FreeRTOSVariant.h>
+#include <list.h>
+#include <mpu_wrappers.h>
+#include <portable.h>
+#include <portmacro.h>
+#include <projdefs.h>
+#include <queue.h>
+#include <semphr.h>
+#include <StackMacros.h>
+#include <task.h>
+#include <timers.h>
+
 #include "blueduino_499_proj_init.h"
 #include "499_data_types.h"
 
@@ -24,7 +40,7 @@ void loop() {
 
   _lowG_Gyro.getMotion6(&bt_msg.low_g_x, &bt_msg.low_g_y, &bt_msg.low_g_z, &bt_msg.gyro_x, &bt_msg.gyro_y, &bt_msg.gyro_z);
 
-  //Align axis
+  //Align axis & reduce 16 bit data to 8
   // *****FIX ME*****
 
   Serial.println("DONE!");

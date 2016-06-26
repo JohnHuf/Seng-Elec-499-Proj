@@ -13,6 +13,34 @@ typedef struct{
 	int16_t gyro_x;
 	int16_t gyro_y;
 	int16_t gyro_z;
-} bluetooth_msg;
+}bluetooth_msg;
+
+class 499_BT_FIFO{
+	public:
+		499_BT_FIFO(uint8_t size = 16);
+		
+		~499_BT_FIFO();
+		
+		bool push(bluetooth_msg MSG);
+		bluetooth_msg pop();
+		
+	private:
+		bluetooth_msg * data, front, back;
+		uint8_t size, count;
+}
+
+499_BT_FIFO::499_BT_FIFO(uint8_t size){
+	data = (bluetooth_msg) new(sizeof(bluetooth_msg)*size);
+	back = data;
+	front = data;
+	this->size = size;
+	count = 0;
+}
+
+499_BT_FIFO::~499_BT_FIFO(){
+	delete(data);
+}
+
+
 
 #endif

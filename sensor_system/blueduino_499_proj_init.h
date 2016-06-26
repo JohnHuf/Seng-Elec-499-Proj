@@ -3,6 +3,7 @@
 
 #include "high_g_accel.h"
 #include "MPU6050.h"
+#include "tasks_499.h"
 
 #include <SPI.h>
 #include <Wire.h>
@@ -11,6 +12,7 @@
 #define LOW_G_1KHz    7
 
 MPU6050 _lowG_Gyro;
+
 
 /** 
  *  Initialization function
@@ -39,6 +41,31 @@ void blueduino_init(){
 	
 	//USB serial 
 	Serial.begin(USB_BAUD_RATE);
+
+  //Task Initializations
+  xTaskCreate(
+    HighG_poll_task,
+    (const portCHAR *)"HIGH_G_POLL",
+    128,
+    NULL,
+    1,
+    NULL);
+
+  xTaskCreate(
+    LowG_poll_task,
+    (const portCHAR *)"LOW_G_POLL",
+    128,
+    NULL,
+    3,
+    NULL);
+
+  xTaskCreate(
+    BT_send_task,
+    (const portCHAR *)"BT_MSG",
+    128,
+    NULL,
+    3,
+    NULL);
 }
 
 
