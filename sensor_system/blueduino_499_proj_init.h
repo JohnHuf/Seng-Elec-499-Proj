@@ -5,7 +5,7 @@
 #include "MPU6050.h"
 #include "tasks_499.h"
 #include "499_data_types.h"
-#include "timer1_code/timerOne.h"
+#include "scheduler.h"
 
 #include <SPI.h>
 #include <Wire.h>
@@ -16,7 +16,7 @@
 
 MPU6050 _lowG_Gyro;
 BT_FIFO * glb_msg_fifo_ptr;
-TaskHandle_t highGHandle;
+
 
 /** 
  *  Initialization function
@@ -30,7 +30,9 @@ void blueduino_init(){
 	digitalWrite(SPI_CS, HIGH);
 	SPI.beginTransaction(SPISettings(HIGH_G_ACCEL_MAX_SPI_CLK, HIGH_G_ACCEL_BIT_ORDER, HIGH_G_ACCEL_SPI_MODE));
 	SPI.begin();
-	
+
+  Scheduler_Init();
+  
 	//High G accelerometer init
 	high_g_init();
 
@@ -51,11 +53,19 @@ void blueduino_init(){
 	Serial1.begin(USB_BAUD_RATE);
 
   //Task Initializations
+
+
+  Scheduler_StartTask(0, 2, HighG_poll_task);
+
+  Scheduler_StartTask(0, 4, LowG_poll_task);
+  Scheduler_StartTask(0, 5, BT_send_task);
+  /*
   xTaskCreate(HighG_poll_task,(const portCHAR *)"HIGH_G_POLL",128,NULL,3,&highGHandle);
 
   xTaskCreate(LowG_poll_task,(const portCHAR *)"LOW_G_POLL",128, NULL,2, NULL);
 
   xTaskCreate( BT_send_task, (const portCHAR *)"BT_MSG",128, NULL, 1, NULL);
+  */
 }
 
 

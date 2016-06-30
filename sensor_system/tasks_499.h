@@ -1,94 +1,77 @@
 #ifndef _TASKS_499_H
 #define _TASKS_499_H
 
-#include "FreeRTOS/Arduino_FreeRTOS.h"
 
 #include "blueduino_499_proj_init.h"
 #include "499_data_types.h"
 #include "AB_BLE.h"
-#include "timer1_code/timerOne.h"
+
 
 extern BT_FIFO * glb_msg_fifo_ptr;
 extern MPU6050 _lowG_Gyro;
-extern  TaskHandle_t highGHandle;
+int start = micros();
 
-void timerInterrupt();
-
-void HighG_poll_task( void *pvParameters ){
+void HighG_poll_task(){
 	bluetooth_msg tempMsg;
 	int8_t tempX, tempY, tempZ;
+	Serial.println("high g start");
+
 	
-	Timer1.initialize(10000);
-	Timer1.attachInterrupt(&timerInterrupt);
-  
-	for(;;){
-		Serial.println("high g start");
+	
+	tempX = high_g_read(HIGH_G_ACCEL_OUT_Z);
+	tempY = high_g_read(HIGH_G_ACCEL_OUT_Y);
+	tempZ = high_g_read(HIGH_G_ACCEL_OUT_X);
 
-		
-		
-		tempX = high_g_read(HIGH_G_ACCEL_OUT_Z);
-		tempY = high_g_read(HIGH_G_ACCEL_OUT_Y);
-		tempZ = high_g_read(HIGH_G_ACCEL_OUT_X);
+	
+	tempMsg.time = (uint8_t) millis();
+	tempMsg.ctrl = HIGH_G_MSG;
+	tempMsg.high_g_x = tempX;
+	tempMsg.high_g_y = tempY;
+	tempMsg.high_g_z = tempZ;
+	//Set Others to zero?
 
+	//Lock mutex to prevent preemption wrecking fifo?
+	if(!glb_msg_fifo_ptr->push(tempMsg)){}
+		//Handle errors?
+	
+	
+	Serial.println("high g end");
+	Serial.print("suspend time: \t");
+	Serial.println(micros()-start);
 		
-		tempMsg.time = (uint8_t) millis();
-		tempMsg.ctrl = HIGH_G_MSG;
-		tempMsg.high_g_x = tempX;
-		tempMsg.high_g_y = tempY;
-		tempMsg.high_g_z = tempZ;
-		//Set Others to zero?
-  
-		//Lock mutex to prevent preemption wrecking fifo?
-		if(!glb_msg_fifo_ptr->push(tempMsg)){}
-			//Handle errors?
-		
-		
-		Serial.println("high g end");
-		long time = micros();
-		
-		Timer1.resume();
-		
-		vTaskSuspend(NULL);
-		Serial.print("suspend time: \t");
-		Serial.println(micros()-time);
-		
-		
-		
-	}
 }
 
-void LowG_poll_task( void *pvParameters ){
+void LowG_poll_task(){
 	bluetooth_msg temp;
 	int16_t accX, accY, accZ, gyroX, gyroY, gyroZ;
-	for(;;){
-		Serial.println("Low G start");
-		
-		_lowG_Gyro.getMotion6(&accX, &accY, &accZ, &gyroX, &gyroY, &gyroZ);
+	Serial.println("Low G start");
 	
-		
-		temp.time = (uint8_t) millis();
-		temp.ctrl = LOW_G_MSG;
-		temp.low_g_x = (int8_t) accX/2;
-		temp.low_g_y = (int8_t) accY/2;
-		temp.low_g_z = (int8_t) accZ/2;
-		temp.gyro_x = (int8_t) gyroX/2;
-		temp.gyro_y = (int8_t) gyroY/2;
-		temp.gyro_z = (int8_t) gyroZ/2;
-		//Set Others to zero?
-  
-		//Lock mutex to prevent preemption wrecking fifo?
-		if(!glb_msg_fifo_ptr->push(temp)){}
-			//Handle errors?
-		//Serial.println("Low G end");
-		vTaskDelay(6);
-	}
+	_lowG_Gyro.getMotion6(&accX, &accY, &accZ, &gyroX, &gyroY, &gyroZ);
+
+	
+	temp.time = (uint8_t) millis();
+	temp.ctrl = LOW_G_MSG;
+	temp.low_g_x = (int8_t) accX;
+	temp.low_g_y = (int8_t) accY;
+	temp.low_g_z = (int8_t) accZ;
+	temp.gyro_x = (int8_t) gyroX;
+	temp.gyro_y = (int8_t) gyroY;
+	temp.gyro_z = (int8_t) gyroZ;
+	//Set Others to zero?
+
+	//Lock mutex to prevent preemption wrecking fifo?
+	if(!glb_msg_fifo_ptr->push(temp)){}
+		//Handle errors?
+	//Serial.println("Low G end");
+  Serial.println("Low g end");
+  Serial.print("suspend time: \t");
+  Serial.println(micros()-start);
 }
 
-void BT_send_task( void *pvParamters ){
+void BT_send_task(){
 	AB_BLE bluetooth(&Serial1);
 	unsigned char msgBuffer[12];
 	bluetooth_msg temp;
-	for(;;){
 		
 		Serial.println("BLE start");
 		temp = glb_msg_fifo_ptr->pop();
@@ -111,16 +94,12 @@ void BT_send_task( void *pvParamters ){
 			msgBuffer[11] = 0x00;
 			bluetooth.write(msgBuffer, 12);
 		}	
-		
+		Serial.println("BLE end");
+    Serial.print("suspend time: \t");
+    Serial.println(micros()-start);
+    
 		//Serial.println("BLE end");
-		vTaskDelay(10);
-	}
 }
 
-void timerInterrupt(){
-	Serial.println("interrupt");
-	Timer1.stop();
-	vTaskResume(highGHandle);
-}
 
 #endif
