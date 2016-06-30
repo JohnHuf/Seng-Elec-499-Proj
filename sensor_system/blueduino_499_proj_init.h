@@ -5,6 +5,7 @@
 #include "MPU6050.h"
 #include "tasks_499.h"
 #include "499_data_types.h"
+#include "timer1_code/timerOne.h"
 
 #include <SPI.h>
 #include <Wire.h>
@@ -15,6 +16,7 @@
 
 MPU6050 _lowG_Gyro;
 BT_FIFO * glb_msg_fifo_ptr;
+TaskHandle_t highGHandle;
 
 /** 
  *  Initialization function
@@ -49,11 +51,11 @@ void blueduino_init(){
 	Serial1.begin(USB_BAUD_RATE);
 
   //Task Initializations
-  xTaskCreate(HighG_poll_task,(const portCHAR *)"HIGH_G_POLL",128,NULL,1,NULL);
+  xTaskCreate(HighG_poll_task,(const portCHAR *)"HIGH_G_POLL",128,NULL,3,&highGHandle);
 
-  xTaskCreate(LowG_poll_task,(const portCHAR *)"LOW_G_POLL",128, NULL,3, NULL);
+  xTaskCreate(LowG_poll_task,(const portCHAR *)"LOW_G_POLL",128, NULL,2, NULL);
 
-  xTaskCreate( BT_send_task, (const portCHAR *)"BT_MSG",128, NULL, 3, NULL);
+  xTaskCreate( BT_send_task, (const portCHAR *)"BT_MSG",128, NULL, 1, NULL);
 }
 
 

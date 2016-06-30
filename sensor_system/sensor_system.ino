@@ -7,7 +7,7 @@
 #include "FreeRTOS/mpu_wrappers.h"
 #include "FreeRTOS/portable.h"
 #include "FreeRTOS/portmacro.h"
-#include "FreeRTOS/projdefs.h"
+#include "FreeRTOS/projdefs.h"M
 #include "FreeRTOS/queue.h"
 #include "FreeRTOS/semphr.h"
 #include "FreeRTOS/StackMacros.h"
@@ -25,7 +25,6 @@ void setup() {
   delay(10000);
 
   Serial.println("end init");
-  //vTaskStartScheduler();
 }
 
 void loop() {
