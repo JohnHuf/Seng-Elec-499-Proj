@@ -70,8 +70,8 @@
 #ifndef SEMAPHORE_H
 #define SEMAPHORE_H
 
-#ifndef INC_ARDUINO_FREERTOS_H
-	#error "include Arduino_FreeRTOS.h" must appear in source files before "include semphr.h"
+#ifndef INC_FREERTOS_H
+	#error "include FreeRTOS.h" must appear in source files before "include semphr.h"
 #endif
 
 #include "queue.h"
@@ -420,8 +420,7 @@ typedef QueueHandle_t SemaphoreHandle_t;
  * \defgroup xSemaphoreGive xSemaphoreGive
  * \ingroup Semaphores
  */
-//#define xSemaphoreGive( xSemaphore )		xQueueGenericSend( ( QueueHandle_t ) ( xSemaphore ), NULL, semGIVE_BLOCK_TIME, queueSEND_TO_BACK )
-#define xSemaphoreGive( xSemaphore )		xQueueGive( ( QueueHandle_t ) ( xSemaphore ), semGIVE_BLOCK_TIME ) // xxx feilipu adjusted to use xQueueGive()
+#define xSemaphoreGive( xSemaphore )		xQueueGenericSend( ( QueueHandle_t ) ( xSemaphore ), NULL, semGIVE_BLOCK_TIME, queueSEND_TO_BACK )
 
 /**
  * semphr. h

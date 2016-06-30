@@ -1,26 +1,21 @@
 #ifndef _TASKS_499_H
 #define _TASKS_499_H
 
-#include "FreeRTOS/Arduino_FreeRTOS.h"
+#include "FreeRTOS/FreeRTOS.h"
 
 #include "blueduino_499_proj_init.h"
 #include "499_data_types.h"
 #include "AB_BLE.h"
-#include "timer1_code/timerOne.h"
+
 
 extern BT_FIFO * glb_msg_fifo_ptr;
 extern MPU6050 _lowG_Gyro;
 extern  TaskHandle_t highGHandle;
 
-void timerInterrupt();
 
 void HighG_poll_task( void *pvParameters ){
 	bluetooth_msg tempMsg;
 	int8_t tempX, tempY, tempZ;
-	
-	Timer1.initialize(10000);
-	Timer1.attachInterrupt(&timerInterrupt);
-  
 	for(;;){
 		Serial.println("high g start");
 
@@ -46,9 +41,8 @@ void HighG_poll_task( void *pvParameters ){
 		Serial.println("high g end");
 		long time = micros();
 		
-		Timer1.resume();
 		
-		vTaskSuspend(NULL);
+		vTaskDelay(1);
 		Serial.print("suspend time: \t");
 		Serial.println(micros()-time);
 		
@@ -80,7 +74,7 @@ void LowG_poll_task( void *pvParameters ){
 		if(!glb_msg_fifo_ptr->push(temp)){}
 			//Handle errors?
 		//Serial.println("Low G end");
-		vTaskDelay(6);
+		vTaskDelay(1);
 	}
 }
 
@@ -113,14 +107,9 @@ void BT_send_task( void *pvParamters ){
 		}	
 		
 		//Serial.println("BLE end");
-		vTaskDelay(10);
+		vTaskDelay(1);
 	}
 }
 
-void timerInterrupt(){
-	Serial.println("interrupt");
-	Timer1.stop();
-	vTaskResume(highGHandle);
-}
 
 #endif

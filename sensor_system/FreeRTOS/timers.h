@@ -71,11 +71,14 @@
 #ifndef TIMERS_H
 #define TIMERS_H
 
-#ifndef INC_ARDUINO_FREERTOS_H
-	#error "include Arduino_FreeRTOS.h must appear in source files before include timers.h"
+#ifndef INC_FREERTOS_H
+	#error "include FreeRTOS.h must appear in source files before include timers.h"
 #endif
 
+/*lint -e537 This headers are only multiply included if the application code
+happens to also be including task.h. */
 #include "task.h"
+/*lint +e537 */
 
 #ifdef __cplusplus
 extern "C" {
@@ -1125,7 +1128,7 @@ BaseType_t xTimerPendFunctionCall( PendedFunction_t xFunctionToPend, void *pvPar
  *
  * @return The name assigned to the timer specified by the xTimer parameter.
  */
-const char * pcTimerGetTimerName( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION;
+const char * pcTimerGetTimerName( TimerHandle_t xTimer ) PRIVILEGED_FUNCTION; /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 
 /*
  * Functions beyond this part are not part of the public API and are intended

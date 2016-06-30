@@ -71,8 +71,8 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#ifndef INC_ARDUINO_FREERTOS_H
-	#error "include Arduino_FreeRTOS.h" must appear in source files before "include queue.h"
+#ifndef INC_FREERTOS_H
+	#error "include FreeRTOS.h" must appear in source files before "include queue.h"
 #endif
 
 #ifdef __cplusplus
@@ -590,7 +590,7 @@ typedef void * QueueSetMemberHandle_t;
  * \ingroup QueueManagement
  */
 BaseType_t xQueueGenericSend( QueueHandle_t xQueue, const void * const pvItemToQueue, TickType_t xTicksToWait, const BaseType_t xCopyPosition ) PRIVILEGED_FUNCTION;
-BaseType_t xQueueGive( QueueHandle_t xQueue, TickType_t xTicksToWait ) PRIVILEGED_FUNCTION; // xxx feilipu created this to speed up mutex semaphores (like the one GiveFromISR), hope it works...
+
 /**
  * queue. h
  * <pre>

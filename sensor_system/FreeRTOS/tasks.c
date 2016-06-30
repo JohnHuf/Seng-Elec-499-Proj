@@ -77,7 +77,7 @@ task.h is included from an application file. */
 #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
 /* FreeRTOS includes. */
-#include "Arduino_FreeRTOS.h"
+#include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
 #include "StackMacros.h"
@@ -108,7 +108,7 @@ functions but without including stdio.h here. */
 /*
  * Defines the size, in words, of the stack allocated to the idle task.
  */
-#define tskIDLE_STACK_SIZE	configIDLE_STACK_SIZE
+#define tskIDLE_STACK_SIZE	configMINIMAL_STACK_SIZE
 
 #if( configUSE_PREEMPTION == 0 )
 	/* If the cooperative scheduler is being used then a yield should not be
@@ -192,7 +192,11 @@ typedef struct tskTaskControlBlock
 		volatile eNotifyValue eNotifyState;
 	#endif
 
-} TCB_t;
+} tskTCB;
+
+/* The old tskTCB name is maintained above then typedefed to the new TCB_t name
+below to enable the use of older kernel aware debuggers. */
+typedef tskTCB TCB_t;
 
 /*
  * Some kernel aware debuggers require the data the debugger needs access to to
@@ -1035,7 +1039,7 @@ StackType_t *pxTopOfStack;
 				}
 			#endif
 
-			else
+			else /*lint !e525 Negative indentation is intended to make use of pre-processor clearer. */
 			{
 				/* If the task is not in any other state, it must be in the
 				Ready (including pending ready) state. */
@@ -1044,7 +1048,7 @@ StackType_t *pxTopOfStack;
 		}
 
 		return eReturn;
-	}
+	} /*lint !e818 xTask cannot be a pointer to const because it is a typedef. */
 
 #endif /* INCLUDE_eTaskGetState */
 /*-----------------------------------------------------------*/
@@ -1623,7 +1627,6 @@ void vTaskEndScheduler( void )
 	portDISABLE_INTERRUPTS();
 	xSchedulerRunning = pdFALSE;
 	vPortEndScheduler();
-	portENABLE_INTERRUPTS(); /* As per comment, enable interrupts. */
 }
 /*----------------------------------------------------------*/
 
@@ -1814,7 +1817,7 @@ UBaseType_t uxTaskGetNumberOfTasks( void )
 
 #if ( INCLUDE_pcTaskGetTaskName == 1 )
 
-	char *pcTaskGetTaskName( TaskHandle_t xTaskToQuery )
+	char *pcTaskGetTaskName( TaskHandle_t xTaskToQuery ) /*lint !e971 Unqualified char types are allowed for strings and single characters only. */
 	{
 	TCB_t *pxTCB;
 
@@ -3267,7 +3270,7 @@ TCB_t *pxNewTCB;
 			ulCount++;
 		}
 
-		ulCount /= ( uint32_t ) sizeof( StackType_t );
+		ulCount /= ( uint32_t ) sizeof( StackType_t ); /*lint !e961 Casting is not redundant on smaller architectures. */
 
 		return ( uint16_t ) ulCount;
 	}
@@ -3523,7 +3526,7 @@ TCB_t *pxTCB;
 					/* Reset the event list item value.  It cannot be in use for
 					any other purpose if this task is running, and it must be
 					running to give back the mutex. */
-					listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxTCB->uxPriority );
+					listSET_LIST_ITEM_VALUE( &( pxTCB->xEventListItem ), ( TickType_t ) configMAX_PRIORITIES - ( TickType_t ) pxTCB->uxPriority ); /*lint !e961 MISRA exception as the casts are only redundant for some ports. */
 					prvAddTaskToReadyList( pxTCB );
 
 					/* Return true to indicate that a context switch is required.

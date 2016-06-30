@@ -5,7 +5,6 @@
 #include "MPU6050.h"
 #include "tasks_499.h"
 #include "499_data_types.h"
-#include "timer1_code/timerOne.h"
 
 #include <SPI.h>
 #include <Wire.h>

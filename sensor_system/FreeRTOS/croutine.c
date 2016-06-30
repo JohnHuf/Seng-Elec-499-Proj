@@ -67,7 +67,7 @@
     1 tab == 4 spaces!
 */
 
-#include "Arduino_FreeRTOS.h"
+#include "FreeRTOS.h"
 #include "task.h"
 #include "croutine.h"
 

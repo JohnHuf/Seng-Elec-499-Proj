@@ -75,7 +75,7 @@ all the API functions to use the MPU wrappers.  That should only be done when
 task.h is included from an application file. */
 #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
 
-#include "Arduino_FreeRTOS.h"
+#include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "timers.h"
@@ -84,7 +84,12 @@ task.h is included from an application file. */
 	#error configUSE_TIMERS must be set to 1 to make the xTimerPendFunctionCall() function available.
 #endif
 
-#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+/* Lint e961 and e750 are suppressed as a MISRA exception justified because the
+MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined for the
+header files above, but not in this file, in order to generate the correct
+privileged Vs unprivileged linkage and placement. */
+#undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE /*lint !e961 !e750. */
+
 
 /* This entire source file will be skipped if the application is not configured
 to include software timer functionality.  This #if is closed at the very bottom
@@ -149,6 +154,9 @@ typedef struct tmrTimerQueueMessage
 	} u;
 } DaemonTaskMessage_t;
 
+/*lint -e956 A manual analysis and inspection has been used to determine which
+static variables must be declared volatile. */
+
 /* The list in which active timers are stored.  Timers are referenced in expire
 time order, with the nearest expiry time at the front of the list.  Only the
 timer service task is allowed to access these lists. */
@@ -165,6 +173,8 @@ PRIVILEGED_DATA static QueueHandle_t xTimerQueue = NULL;
 	PRIVILEGED_DATA static TaskHandle_t xTimerTaskHandle = NULL;
 
 #endif
+
+/*lint +e956 */
 
 /*-----------------------------------------------------------*/
 

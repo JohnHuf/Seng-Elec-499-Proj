@@ -1,4 +1,4 @@
-#include "FreeRTOS/Arduino_FreeRTOS.h"
+#include "FreeRTOS/FreeRTOS.h"
 #include "FreeRTOS/croutine.h"
 #include "FreeRTOS/event_groups.h"
 #include "FreeRTOS/FreeRTOSConfig.h"
