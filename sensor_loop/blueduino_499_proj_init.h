@@ -14,15 +14,11 @@
 #define MSG_FIFO_SIZE	16
 
 MPU6050 _lowG_Gyro;
-BT_FIFO * glb_msg_fifo_ptr;
-
 /** 
  *  Initialization function
 **/
 void blueduino_init(){
 	//global variable init
-	glb_msg_fifo_ptr = new BT_FIFO(MSG_FIFO_SIZE);
-	
 	//SPI initialization
 	pinMode(SPI_CS, OUTPUT);
 	digitalWrite(SPI_CS, HIGH);
@@ -47,13 +43,6 @@ void blueduino_init(){
 	//USB serial 
 	Serial.begin(USB_BAUD_RATE);
 	Serial1.begin(USB_BAUD_RATE);
-
-  //Task Initializations
- // xTaskCreate(HighG_poll_task,(const portCHAR *)"HIGH_G_POLL",128,NULL,1,NULL);
-
-  xTaskCreate(schedule_tasks,(const portCHAR *)"LOW_G_POLL",128, NULL,3, NULL);
-
-  xTaskCreate( BT_send_task, (const portCHAR *)"BT_MSG",128, NULL, 3, NULL);
 }
 
 

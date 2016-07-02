@@ -6,11 +6,12 @@
 #include "blueduino_499_proj_init.h"
 #include "499_data_types.h"
 #include "AB_BLE.h"
+#include "scheduler.h"
 
 extern BT_FIFO * glb_msg_fifo_ptr;
 extern MPU6050 _lowG_Gyro;
 
-void HighG_poll_task( void *pvParameters ){
+void HighG_poll_task(){
 	bluetooth_msg tempMsg;
 	int8_t tempX, tempY, tempZ;
 	for(;;){
@@ -32,15 +33,20 @@ void HighG_poll_task( void *pvParameters ){
 		if(!glb_msg_fifo_ptr->push(tempMsg)){}
 			//Handle errors?
 		
-		//Serial.println("high g end");
-		vTaskDelay(1);
+		Serial.println("high g end");
+    Serial.println(millis());
+		//vTaskDelay(1);
 	}
 }
 
-void LowG_poll_task( void *pvParameters ){
+
+
+
+
+void LowG_poll_task(){
 	bluetooth_msg temp;
 	int16_t accX, accY, accZ, gyroX, gyroY, gyroZ;
-	for(;;){
+//	for(;;){
 		Serial.println("Low G start");
 		
 		_lowG_Gyro.getMotion6(&accX, &accY, &accZ, &gyroX, &gyroY, &gyroZ);
@@ -59,11 +65,18 @@ void LowG_poll_task( void *pvParameters ){
 		//Lock mutex to prevent preemption wrecking fifo?
 		if(!glb_msg_fifo_ptr->push(temp)){}
 			//Handle errors?
-		//Serial.println("Low G end");
-		vTaskDelay(6);
-	}
+		Serial.println("Low G end");
+    Serial.println(millis());
+		//vTaskDelay(6);
+	//}
 }
 
+void schedule_tasks(void *pvParameters){
+  Scheduler_Init();
+  Scheduler_StartTask(0,1,LowG_poll_task);
+  Scheduler_StartTask(0,1,HighG_poll_task);
+  Scheduler_Dispatch();
+}
 void BT_send_task( void *pvParamters ){
 	AB_BLE bluetooth(&Serial1);
 	unsigned char msgBuffer[12];
@@ -82,7 +95,7 @@ void BT_send_task( void *pvParamters ){
 			msgBuffer[2] = temp.high_g_x;
 			msgBuffer[3] = temp.high_g_x;
 			msgBuffer[4] = temp.high_g_x;
-			msgBuffer[2+3] = temp.low_g_x;
+			msgBuffer[5] = temp.low_g_x;
 			msgBuffer[6] = temp.low_g_x;
 			msgBuffer[7] = temp.low_g_x;
 			msgBuffer[8] = temp.gyro_x;
@@ -92,7 +105,8 @@ void BT_send_task( void *pvParamters ){
 			bluetooth.write(msgBuffer, 12);
 		}	
 		
-		//Serial.println("BLE end");
+		Serial.println("BLE end");
+    Serial.println(millis());
 		vTaskDelay(10);
 	}
 }
