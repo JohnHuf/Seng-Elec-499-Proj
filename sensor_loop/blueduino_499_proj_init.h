@@ -41,8 +41,15 @@ void blueduino_init(){
   //Leave Gyro for now? 250
 	
 	//USB serial 
-	Serial.begin(USB_BAUD_RATE);
-	Serial1.begin(USB_BAUD_RATE);
+	Serial.begin(115200);
+	//Serial1.begin(USB_BAUD_RATE);
+
+  //Serial1.print("AT+BAUD4");
+  //Serial1.print("AT+RESET");
+  //Serial1.end();
+  //Serial1.begin(115200);
+  //Serial1.print("AT+RESET");
+  
 }
 
 

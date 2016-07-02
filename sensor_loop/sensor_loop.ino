@@ -8,7 +8,7 @@
 
 void setup() {
   blueduino_init();
-  delay(10000);
+  delay(20000);
 
   Serial.println("end init");
 }
@@ -18,7 +18,7 @@ void loop() {
   unsigned long loop_begin_time = micros();
   bluetooth_msg msg = poll_task();
   BT_send_task(&msg);
-  Serial.println("DONE!");
-  Serial.print("TIME USED:  ");
-  Serial.println((micros()-loop_begin_time));
+  unsigned long loop_end_time = micros();
+  if(loop_begin_time-loop_end_time < 1000)
+    delay(1000 - loop_end_time - loop_begin_time);
 }
