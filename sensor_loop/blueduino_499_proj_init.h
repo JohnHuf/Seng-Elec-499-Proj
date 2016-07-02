@@ -32,7 +32,7 @@ void blueduino_init(){
    * Low G/Gyro Init
    * Using MPU6050_test.ino as reference file for initalization procedure
    **/
-  Wire.begin();
+  //Wire.begin();
   _lowG_Gyro.initialize();
   //set sample rate to 1 KHz (Same as High G)
   _lowG_Gyro.setRate(LOW_G_1KHz);

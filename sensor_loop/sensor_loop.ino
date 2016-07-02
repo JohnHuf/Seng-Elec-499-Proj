@@ -7,7 +7,6 @@
 #define SENSOR_PERIOD_US 1000;
 
 void setup() {
-  delay(1000);
   blueduino_init();
   delay(10000);
 
@@ -15,6 +14,11 @@ void setup() {
 }
 
 void loop() {
+  //Loop to poll and send sensor data via Bluetooth
+  unsigned long loop_begin_time = micros();
   bluetooth_msg msg = poll_task();
   BT_send_task(&msg);
+  Serial.println("DONE!");
+  Serial.print("TIME USED:  ");
+  Serial.println((micros()-loop_begin_time));
 }
