@@ -17,32 +17,33 @@ public class BleMessage{
 	int gyro_z;
 	
 	public BleMessage(byte[] data){
-		time = data[0] & MASK;
-		ctrl = data[1] & MASK;
-		high_g_x = data[2] & MASK;
-		high_g_y = data[3] & MASK;
-		high_g_z = data[4] & MASK;
-		low_g_x = data[5] & MASK;
-		low_g_y = data[6] & MASK;
-		low_g_z = data[7] & MASK;
-		gyro_x = data[8] & MASK;
-		gyro_y = data[9] & MASK;
-		gyro_z = data[10] & MASK;
+		time = data[0];
+		ctrl = data[1];
+		high_g_x = data[2];
+		high_g_y = data[3];
+		high_g_z = data[4];
+		low_g_x = data[5];
+		low_g_y = data[6];
+		low_g_z = data[7];
+		gyro_x = data[8];
+		gyro_y = data[9];
+		gyro_z = data[10];
 	}
 	
+
 	public String toString(){
 		String ret;
-		ret="Time = "+time+"\n";
-		ret+="Control = "+ctrl+"\n";
-		ret+="High G X = "+high_g_x+"\n";
-		ret+="High G Y = "+high_g_y+"\n";
-		ret+="High G Z = "+high_g_z+"\n";
-		ret+="Low G X = "+low_g_x+"\n";
-		ret+="Low G Y = "+low_g_y+"\n";
-		ret+="Low G Z = "+low_g_z+"\n";
-		ret+="Gyro X = "+gyro_x+"\n";
-		ret+="Gyro Y = "+gyro_y+"\n";
-		ret+="Gyro Z = "+gyro_z+"\n";
+		ret=time+",";
+		ret+=ctrl+",";
+		ret+=high_g_x+",";
+		ret+=high_g_y+",";
+		ret+=high_g_z+",";
+		ret+=low_g_x+",";
+		ret+=low_g_y+",";
+		ret+=low_g_z+",";
+		ret+=gyro_x+",";
+		ret+=gyro_y+",";
+		ret+=gyro_z+",";
 		return ret;
 	}
 	
