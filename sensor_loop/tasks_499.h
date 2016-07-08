@@ -18,17 +18,17 @@ bluetooth_msg poll_task(){
 	
 	temp.time = (uint8_t) millis();
 	temp.ctrl = BOTH_MSG;
-	temp.low_g_x = (int8_t) accX;
-	temp.low_g_y = (int8_t) accY;
-	temp.low_g_z = (int8_t) accZ;
-	temp.gyro_x = (int8_t) gyroX;
-	temp.gyro_y = (int8_t) gyroY;
-	temp.gyro_z = (int8_t) gyroZ;
-  temp.high_g_x = high_g_read(HIGH_G_ACCEL_OUT_X);
-  temp.high_g_y = high_g_read(HIGH_G_ACCEL_OUT_Y);
-  temp.high_g_z = high_g_read(HIGH_G_ACCEL_OUT_Z);
-  //Lock mutex to prevent preemption wrecking fifo?
-  //Serial.println("Sensor polling complete.");
+	temp.low_g_x = (int8_t)(-accX)/256;
+	temp.low_g_y = (int8_t)accY/256;
+	temp.low_g_z = (int8_t)(-accZ)/256;
+	temp.gyro_x = (int8_t)(-gyroX)/256;
+	temp.gyro_y = (int8_t)gyroY/256;
+	temp.gyro_z = (int8_t)(-gyroX)/256;
+  temp.high_g_x = (int8_t) high_g_read(HIGH_G_ACCEL_OUT_X);
+  temp.high_g_y = (int8_t) -high_g_read(HIGH_G_ACCEL_OUT_Y);
+  temp.high_g_z = (int8_t) -high_g_read(HIGH_G_ACCEL_OUT_Z);
+
+  delay(100);
   return temp;
 }
 
@@ -40,14 +40,14 @@ void BT_send_task(bluetooth_msg * temp){
 	msgBuffer[0] = temp->time;
 	msgBuffer[1] = temp->ctrl;
 	msgBuffer[2] = temp->high_g_x;
-	msgBuffer[3] = temp->high_g_x;
-	msgBuffer[4] = temp->high_g_x;
+	msgBuffer[3] = temp->high_g_y;
+	msgBuffer[4] = temp->high_g_z;
 	msgBuffer[5] = temp->low_g_x;
-	msgBuffer[6] = temp->low_g_x;
-	msgBuffer[7] = temp->low_g_x;
+	msgBuffer[6] = temp->low_g_y;
+	msgBuffer[7] = temp->low_g_z;
 	msgBuffer[8] = temp->gyro_x;
-	msgBuffer[9] = temp->gyro_x;
-	msgBuffer[10] = temp->gyro_x;
+	msgBuffer[9] = temp->gyro_y;
+	msgBuffer[10] = temp->gyro_z;
 	msgBuffer[11] = '\r';
   msgBuffer[12] = '\n';
 	Serial.write(msgBuffer, 13);
