@@ -36,20 +36,20 @@ out.write("@attribute punch_type {jab, hook, uppercut, noise}\n")
 out.write("\n@data\n")
 
 import os
-directorynames = {"jab/", "hook/", "uppercut/", "noise/"}
+#directorynames = {"punchdata/C/jab/", "punchdata/C/hook/", "punchdata/C/uppercut/", "punchdata/C/noise/", "punchdata/J/jab/", "punchdata/J/hook/", "punchdata/J/uppercut/", "punchdata/J/noise/"}
+directorynames = {"punchdata/C/jab/", "punchdata/C/hook/", "punchdata/C/uppercut/",
+		  "punchdata/J/jab/", "punchdata/J/hook/", "punchdata/J/uppercut/",
+		  "punchdata/F/jab/", "punchdata/F/hook/", "punchdata/F/uppercut/",
+		  "punchdata/B/jab/", "punchdata/B/hook/",
+		  "punchdata/A/jab/", "punchdata/A/hook/", "punchdata/A/uppercut/",
+		  "punchdata/R/jab/", "punchdata/R/hook/", "punchdata/R/uppercut/"}
 for directory in directorynames:
 	for file in os.listdir(directory):
 		# Open a file
 		filename = directory +file
 		fo = open(filename, "r")
-		#fo = open("hook/hook(2).csv", "r")
-		#print "Name of the file: ", fo.name
-		#print "Closed or not : ", fo.closed
-		#print "Opening mode : ", fo.mode
-		#print "Softspace flag : ", fo.softspace
 
 		# FIND GLOBAL SENSOR MAX
-		# name = (time, max_val)
 		max_high_g_x = [0, -999]
 		max_high_g_y = [0, -999]
 		max_high_g_z = [0, -999]
@@ -113,16 +113,6 @@ for directory in directorynames:
 		max_gyro_y[0]   -=offset
 		max_gyro_z[0]   -=offset
 
-#		print "\nMax high g x is: " + str(max_high_g_x[1]) + ", occuring at: " + str(max_high_g_x[0])
-#		print "Max high g y is: "   + str(max_high_g_y[1]) + ", occuring at: " + str(max_high_g_y[0])
-#		print "Max high g z is: "   + str(max_high_g_z[1]) + ", occuring at: " + str(max_high_g_z[0])
-#		print "Max low g x is: "    + str(max_low_g_x[1])  + ", occuring at: " + str(max_low_g_x[0])
-#		print "Max low g y is: "    + str(max_low_g_y[1])  + ", occuring at: " + str(max_low_g_y[0])
-#		print "Max low g z is: "    + str(max_low_g_z[1])  + ", occuring at: " + str(max_low_g_z[0])
-#		print "Max gyro x is: "     + str(max_gyro_x[1])   + ", occuring at: " + str(max_gyro_x[0])
-#		print "Max gyro y is: "     + str(max_gyro_y[1])   + ", occuring at: " + str(max_gyro_y[0])
-#		print "Max gyro z is: "     + str(max_gyro_z[1])   + ", occuring at: " + str(max_gyro_z[0])
-
 		# WRITE PUNCH METRICS TO ARFF FILE
-		s = str(max_high_g_x[1])+","+str(max_high_g_x[0])+","+str(max_high_g_y[1])+","+str(max_high_g_y[0])+","+str(max_high_g_z[1])+","+str(max_high_g_z[0])+","+str(max_low_g_x[1])+","+str(max_low_g_x[0])+","+str(max_low_g_y[1])+","+str(max_low_g_y[0])+","+str(max_low_g_z[1])+","+str(max_low_g_z[0])+","+str(max_gyro_x[1])+","+str(max_gyro_x[0])+","+str(max_gyro_y[1])+","+str(max_gyro_y[0])+","+str(max_gyro_z[1])+","+str(max_gyro_z[0])+","+directory[:-1]+"\n"
+		s = str(max_high_g_x[1])+","+str(max_high_g_x[0])+","+str(max_high_g_y[1])+","+str(max_high_g_y[0])+","+str(max_high_g_z[1])+","+str(max_high_g_z[0])+","+str(max_low_g_x[1])+","+str(max_low_g_x[0])+","+str(max_low_g_y[1])+","+str(max_low_g_y[0])+","+str(max_low_g_z[1])+","+str(max_low_g_z[0])+","+str(max_gyro_x[1])+","+str(max_gyro_x[0])+","+str(max_gyro_y[1])+","+str(max_gyro_y[0])+","+str(max_gyro_z[1])+","+str(max_gyro_z[0])+","+directory[12:-1]+"\n"
 		out.write(s)
