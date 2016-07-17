@@ -6,16 +6,25 @@
 #include "blueduino_499_proj_init.h"
 #include "499_data_types.h"
 #include "AB_BLE.h"
-#include "scheduler.h"
+
 
 extern BT_FIFO * glb_msg_fifo_ptr;
 extern MPU6050 _lowG_Gyro;
+extern  TaskHandle_t highGHandle;
+
+void timerInterrupt();
 
 void HighG_poll_task(){
 	bluetooth_msg tempMsg;
 	int8_t tempX, tempY, tempZ;
+	
+	Timer1.initialize(10000);
+	Timer1.attachInterrupt(&timerInterrupt);
+  
 	for(;;){
 		Serial.println("high g start");
+
+		
 		
 		tempX = high_g_read(HIGH_G_ACCEL_OUT_Z);
 		tempY = high_g_read(HIGH_G_ACCEL_OUT_Y);
@@ -32,10 +41,6 @@ void HighG_poll_task(){
 		//Lock mutex to prevent preemption wrecking fifo?
 		if(!glb_msg_fifo_ptr->push(tempMsg)){}
 			//Handle errors?
-		
-		Serial.println("high g end");
-    Serial.println(millis());
-		//vTaskDelay(1);
 	}
 }
 
@@ -109,6 +114,12 @@ void BT_send_task( void *pvParamters ){
     Serial.println(millis());
 		vTaskDelay(10);
 	}
+}
+
+void timerInterrupt(){
+	Serial.println("interrupt");
+	Timer1.stop();
+	vTaskResume(highGHandle);
 }
 
 #endif
