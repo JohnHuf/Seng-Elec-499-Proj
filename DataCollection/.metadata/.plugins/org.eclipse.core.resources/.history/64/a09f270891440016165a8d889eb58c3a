@@ -1,0 +1,20 @@
+
+public class Driver {
+	public static void main (String []args){
+		Sphere test = new Sphere(10);
+		System.out.println(test);
+		System.out.println("Setting radius to 5);
+		test.setRadius(5);
+		System.out.println(test);
+		
+		
+		RectPrism test2 = new RectPrism(1,2,3);
+		System.out.println(test2);
+		System.out.println("Setting length to 2");
+		test2.setLength(2);
+		System.out.println("Length is now" +test2.getLength());
+		
+		Cube test3 = new Cube(3);
+		System.out.println(test3);
+	}
+}

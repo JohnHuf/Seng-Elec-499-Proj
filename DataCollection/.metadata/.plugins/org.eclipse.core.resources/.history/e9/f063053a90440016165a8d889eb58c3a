@@ -1,0 +1,35 @@
+public class Sphere implements Shape {
+	double radius;
+	
+	public Sphere(double r){
+		this.radius=r;
+	}
+	
+	public double getRadius() {
+		return radius;
+	}
+
+	public void setRadius(double radius) {
+		this.radius = radius;
+	}
+
+	public double getArea(){
+		return 4.0*Math.PI*Math.pow(this.radius,2);
+	}
+	
+	public double getVolume(){
+		return 4.0/3.0*Math.PI*Math.pow(this.radius,3);
+	}
+	
+	public String toString(){
+		String ret = "Sphere with radius : "+this.radius+"\n";
+		ret+="Volume is "+getVolume()+"\n";
+		ret+="Area is "+getArea()+"\n";
+		return ret;
+	}
+	
+	public static void main (String []args){
+		Sphere test = new Sphere(10);
+		System.out.println(test);
+	}
+}
