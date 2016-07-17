@@ -1,4 +1,6 @@
 import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import gnu.io.CommPortIdentifier; 
@@ -8,6 +10,8 @@ import gnu.io.SerialPortEventListener;
 import java.util.*;
 import java.io.PrintWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 
 
 public class Serial implements SerialPortEventListener {
@@ -168,10 +172,114 @@ public class Serial implements SerialPortEventListener {
 		}
 		// Ignore all the other eventTypes, but you should consider the other ones.
 	}
+	
+	public static void getArff(){
+		String[] dirs = {"punchdata/C/jab/", "punchdata/C/hook/", "punchdata/C/uppercut/",
+				  "punchdata/J/jab/", "punchdata/J/hook/", "punchdata/J/uppercut/",
+				  "punchdata/F/jab/", "punchdata/F/hook/", "punchdata/F/uppercut/",
+				  "punchdata/B/jab/", "punchdata/B/hook/",
+				  "punchdata/A/jab/", "punchdata/A/hook/", "punchdata/A/uppercut/",
+				  "punchdata/R/jab/", "punchdata/R/hook/", "punchdata/R/uppercut/"};
+		try{
+		PrintWriter out = new PrintWriter( "dataset.arff" );
+		
+		String ret = "";
+		ret+="@relation punch1\n\n";
+		
+		
+		ret+="@attribute name {";
+		for (int i=1;i<=327;i++){
+			ret+="Punch"+i+",";
+		}
+		ret+="}\n";
+		ret+="@attribute bag relational\n";
+		ret+="  @attribute time numeric\n";
+		ret+="  @attribute high_g_x numeric\n";
+		ret+="  @attribute high_g_y numeric\n";
+		ret+="  @attribute high_g_z numeric\n";
+		ret+="  @attribute low_g_x numeric\n";
+		ret+="  @attribute low_g_y numeric\n";
+		ret+="  @attribute low_g_z numeric\n"; 
+		ret+="  @attribute gyro_x numeric\n"; 
+		ret+="  @attribute gyro_y numeric\n"; 
+		ret+="  @attribute gyro_z numeric\n";
+	//	ret+="  @attribute magnitude numeric\n";
+		ret+="@end bag\n";
+		ret+="@attribute punch_type {jab, hook, uppercut, noise}\n\n";
+		ret+="@data\n";
+		int count=0;
+		out.write(ret);
+		for(int i=0;i<dirs.length;i++){
+			File dir = new File(dirs[i]);
+			File[] directoryListing = dir.listFiles();
+			if (directoryListing != null) {
+			    for (File child : directoryListing) {
+			    	count++;
+			    	BufferedReader br = new BufferedReader(new FileReader(child));
+			    	    String line;
+			    	    ret="";
+			    	    ret+="Punch"+count+",\"";
+			    	    line = br.readLine();
+			    	    while (line != null) {
+			    	       // process the line.
+			    	    	
+			    	    	String [] values = line.split(",");
+			    	    	ret+=values[0];
+			    	    	ret+=",";
+			    	    	ret+=values[2];
+			    	    	ret+=",";
+			    	    	ret+=values[3];
+			    	    	ret+=",";
+			    	    	ret+=values[4];
+			    	    	ret+=",";
+			    	    	ret+=values[5];
+			    	    	ret+=",";
+			    	    	ret+=values[6];
+			    	    	ret+=",";
+			    	    	ret+=values[7];
+			    	    	ret+=",";
+			    	    	ret+=values[8];
+			    	    	ret+=",";
+			    	    	ret+=values[9];
+			    	    	ret+=",";
+			    	    	ret+=values[10];
+			    	    //	ret+=",";
+			    	    //	ret+=values[11];
+			    	    	line = br.readLine();
+			    	    	if(line!=null){
+			    	    		ret+="\\n";
+			    	    	}
+			    	    }
+			    	    
+			    	    ret+="\",";
+			    	    if(child.getName().charAt(0)=='j'){
+			    	    	ret+="jab\n";
+			    	    }
+			    	    else if	(child.getName().charAt(0)=='h'){
+			    	    	ret+="hook\n";	    	    
+			    	    }
+			    	    else if	(child.getName().charAt(0)=='u'){
+			    	    	ret+="uppercut\n";			    	    
+			    	    }
+			    	    out.write(ret);
+			    	}
+			
+			    }
+			 }
+		}    	
+		catch(FileNotFoundException e){
+			System.out.println("File not found.");
+		}
+		catch(IOException e){
+			System.out.println("IO Exception");
+		}
+	}
 
 	public static void main(String[] args) throws Exception {
+		
 		Serial main = new Serial();
 		main.initialize();
+		
 		File dir = new File("PunchData\\"+main.punchType);
 		  File[] directoryListing = dir.listFiles();
 		  if (directoryListing != null) {

@@ -1,7 +1,6 @@
 #ifndef _TASKS_499_H
 #define _TASKS_499_H
 
-
 #include "blueduino_499_proj_init.h"
 #include "499_data_types.h"
 #include "AB_BLE.h"
@@ -18,12 +17,12 @@ bluetooth_msg poll_task(){
 	
 	temp.time = (uint8_t) millis();
 	temp.ctrl = BOTH_MSG;
-	temp.low_g_x = (int8_t) accX/2;
-	temp.low_g_y = (int8_t) accY/2;
-	temp.low_g_z = (int8_t) accZ/2;
-	temp.gyro_x = (int8_t) gyroX/2;
-	temp.gyro_y = (int8_t) gyroY/2;
-	temp.gyro_z = (int8_t) gyroZ/2;
+	temp.low_g_x = (int8_t) accX/256;
+	temp.low_g_y = (int8_t) accY/256;
+	temp.low_g_z = (int8_t) accZ/256;
+	temp.gyro_x = (int8_t) gyroX/256;
+	temp.gyro_y = (int8_t) gyroY/256;
+	temp.gyro_z = (int8_t) gyroZ/256;
   temp.high_g_x = high_g_read(HIGH_G_ACCEL_OUT_X);
   temp.high_g_y =  high_g_read(HIGH_G_ACCEL_OUT_Y);
   temp.high_g_z = high_g_read(HIGH_G_ACCEL_OUT_Z);

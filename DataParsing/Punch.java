@@ -5,11 +5,14 @@ import java.util.*;
 
 
 public class Punch{
+	
 	static String [] classes = {"uppercut","jab","hook","noise"};
 	static String [] headers = {"uc","jab","hook","noise"};
+	
 	BleMessage [] raw_data;
 	int speed;
 	boolean isPunch;
+	
 	public Punch(BleMessage [] data){
 		raw_data = data;
 	}
@@ -21,6 +24,8 @@ public class Punch{
 	private double rawToMs2(double input){
 		return input*9.81*16/127;
 	}
+	
+	
 	
 	public double getSpeed(){	
 		//1. find the spike in low G X and use only punch data prior to it
