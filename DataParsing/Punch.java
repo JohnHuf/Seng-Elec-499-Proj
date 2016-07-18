@@ -56,7 +56,7 @@ public class Punch{
 		double velz=0;
 		double speed=0;
 		
-		while(raw_data[i].low_g_x != -128){
+		while(raw_data[i].low_g_x != -128 && i<raw_data.length-1){
 			xrad=rawToRad(raw_data[i].gyro_x);
 			yrad=rawToRad(raw_data[i].gyro_y);
 			zrad=rawToRad(raw_data[i].gyro_z);
@@ -82,9 +82,9 @@ public class Punch{
 			acceleration.add(accel);
 			
 			if (i>0){
-				velx += (raw_data[i].time - raw_data[i-1].time) * ((acceleration.get(i)[0]+acceleration.get(i-1)[0])/2);
-				vely +=(raw_data[i].time - raw_data[i-1].time) * ((acceleration.get(i)[1]+acceleration.get(i-1)[1])/2);
-				velz += (raw_data[i].time - raw_data[i-1].time) * ((acceleration.get(i)[2]+acceleration.get(i-1)[2])/2);
+				velx += (raw_data[i].time - raw_data[i-1].time)/1000.0 * ((acceleration.get(i)[0]+acceleration.get(i-1)[0])/2.0);
+				vely +=(raw_data[i].time - raw_data[i-1].time)/1000.0 * ((acceleration.get(i)[1]+acceleration.get(i-1)[1])/2.0);
+				velz += (raw_data[i].time - raw_data[i-1].time)/1000.0 * ((acceleration.get(i)[2]+acceleration.get(i-1)[2])/2.0);
 			}
 			i++;
 		}
@@ -92,23 +92,35 @@ public class Punch{
 		return speed;
 	}
 	
-	private void fixTimes(){
+	public void fixTimes(){
 		int offset=0;
-		for (int i=0;i<raw_data.length;i++){
-			if(raw_data[i].time==63){
-				continue;
+		int [] time = new int[raw_data.length];
+		raw_data[0].time=0;
+		int t=0;
+		for (int i=1;i<raw_data.length;i++){
+			if(i!=raw_data.length-1&&raw_data[i].time==63&&raw_data[i-1].time<63 && raw_data[i+1].time>63){
+				raw_data[i]=raw_data[i-1];
 			}
-			if((raw_data[i-1].time<0 && raw_data[i].time >= 0) || (raw_data[i-1].time>=0) && (raw_data[i].time<0)){
+			if((raw_data[i-1].time<0 && raw_data[i].time >= 0) || ((raw_data[i-1].time>=0) && (raw_data[i].time<0))){
 				offset+=128;
 			}
 			if(raw_data[i].time<0){
-				raw_data[i].time =128+raw_data[i].time;
+				t =128+raw_data[i].time;
 			}
-			if(raw_data[i].time >=0){
+			else if(raw_data[i].time >=0){
 				//nothing
+				t=raw_data[i].time;
 			}
-			raw_data[i].time+=offset;
+			t+=offset;
+			time[i]=t;
+			
 		}
+		for (int i=1;i<raw_data.length;i++){
+			raw_data[i].time = time[i];
+			System.out.println(time[i]);
+		}
+		
+		
 	}
 	
 	private double square(double input){
@@ -119,12 +131,222 @@ public class Punch{
 		//Find the maximum in High G Accel magnitude
 		double max =0;
 		for(int i=0;i<raw_data.length;i++){
-			double magnitude = square(raw_data[i].high_g_x*0.78125)+square(raw_data[i].high_g_y*0.78125)+square(raw_data[i].high_g_z*0.78125);
+			double magnitude = Math.sqrt(square((double)raw_data[i].high_g_x*0.78125));
 			if (magnitude>max){
 				max=magnitude;
 			}
 		}
 		return max;
+	}
+	
+	public double[] getFeatures(){
+		
+		double high_g_x_mean = 0.0;
+		double high_g_y_mean = 0.0;
+		double high_g_z_mean = 0.0;
+		double low_g_x_mean  = 0.0;
+		double low_g_y_mean  = 0.0;
+		double low_g_z_mean  = 0.0;
+		double gyro_x_mean   = 0.0;
+		double gyro_y_mean   = 0.0;
+		double gyro_z_mean   = 0.0;
+		double high_g_x_var = 0.0;
+		double high_g_y_var = 0.0;
+		double high_g_z_var = 0.0;
+		double low_g_x_var  = 0.0;
+		double low_g_y_var  = 0.0;
+		double low_g_z_var  = 0.0;
+		double gyro_x_var   = 0.0;
+		double gyro_y_var   = 0.0;
+		double gyro_z_var   = 0.0;
+
+		int count=0;
+		
+		for(int i=0;i<raw_data.length;i++){
+			count++;
+			
+			high_g_x_mean +=raw_data[i].high_g_x;
+			high_g_y_mean +=raw_data[i].high_g_y;
+			high_g_z_mean +=raw_data[i].high_g_z;
+			low_g_x_mean +=raw_data[i].low_g_x;
+			low_g_y_mean +=raw_data[i].low_g_y;
+			low_g_z_mean +=raw_data[i].low_g_z;
+			gyro_x_mean +=raw_data[i].gyro_x;
+			gyro_y_mean +=raw_data[i].gyro_y;
+			gyro_z_mean +=raw_data[i].gyro_z;
+			
+			high_g_x_var +=  square(raw_data[i].high_g_x);
+			high_g_y_var += square(raw_data[i].high_g_x);
+			high_g_z_var += square(raw_data[i].high_g_x);
+			low_g_x_var += square(raw_data[i].low_g_x);
+			low_g_y_var += square(raw_data[i].low_g_y);
+			low_g_z_var += square(raw_data[i].low_g_z);
+			gyro_x_var +=  square(raw_data[i].gyro_x);
+			gyro_y_var += square(raw_data[i].gyro_y);
+			gyro_z_var += square(raw_data[i].gyro_z);
+		}
+		high_g_x_mean /=count;
+		high_g_y_mean /=count;
+		high_g_z_mean /=count; 
+		low_g_x_mean /=count;
+		low_g_y_mean /=count;
+		low_g_z_mean /=count;
+		gyro_x_mean /=count;
+		gyro_y_mean /=count;
+		gyro_z_mean /=count;
+		
+		high_g_x_var =  (high_g_x_var/count) - square(high_g_x_mean);
+		high_g_y_var = (high_g_y_var/count) - square(high_g_y_mean);
+		high_g_z_var = (high_g_z_var/count) - square(high_g_z_mean);
+		low_g_x_var = (low_g_x_var/count) - square(low_g_x_mean);
+		low_g_y_var = (low_g_y_var/count) - square(low_g_y_mean);
+		low_g_z_var = (low_g_z_var/count) - square(low_g_z_mean);
+		gyro_x_var = (gyro_x_var/count) - square(gyro_x_mean);
+		gyro_y_var = (gyro_y_var/count) - square(gyro_y_mean);
+		gyro_z_var = (gyro_z_var/count) - square(gyro_z_mean);
+		
+		double high_g_x_skew_t = 0.0;
+		double high_g_x_skew_b = 0.0;
+		double high_g_y_skew_t = 0.0;
+		double high_g_y_skew_b = 0.0;
+		double high_g_z_skew_t = 0.0;
+		double high_g_z_skew_b = 0.0;
+		double low_g_x_skew_t  = 0.0;
+		double low_g_x_skew_b  = 0.0;
+		double low_g_y_skew_t  = 0.0;
+		double low_g_y_skew_b  = 0.0;
+		double low_g_z_skew_t  = 0.0;
+		double low_g_z_skew_b  = 0.0;
+		double gyro_x_skew_t   = 0.0;
+		double gyro_x_skew_b   = 0.0;
+		double gyro_y_skew_t   = 0.0;
+		double gyro_y_skew_b   = 0.0;
+		double gyro_z_skew_t   = 0.0;
+		double gyro_z_skew_b   = 0.0;
+		double high_g_x_kurt_t = 0.0;
+		double high_g_y_kurt_t = 0.0;
+		double high_g_z_kurt_t = 0.0;
+		double low_g_x_kurt_t  = 0.0;
+		double low_g_y_kurt_t  = 0.0;
+		double low_g_z_kurt_t  = 0.0;
+		double gyro_x_kurt_t   = 0.0;
+		double gyro_y_kurt_t   = 0.0;
+		double gyro_z_kurt_t   = 0.0;
+		
+		double high_g_x_skew = 0.0;
+		double high_g_y_skew = 0.0;
+		double high_g_z_skew = 0.0;
+		double low_g_x_skew = 0.0;
+		double low_g_y_skew = 0.0;
+		double low_g_z_skew = 0.0;
+		double gyro_x_skew = 0.0;
+		double gyro_y_skew = 0.0;
+		double gyro_z_skew = 0.0;
+		
+		double high_g_x_kurt = 0.0;
+		double high_g_y_kurt = 0.0;
+		double high_g_z_kurt = 0.0;
+		double low_g_x_kurt = 0.0;
+		double low_g_y_kurt = 0.0;
+		double low_g_z_kurt = 0.0;
+		double gyro_x_kurt = 0.0;
+		double gyro_y_kurt = 0.0;
+		double gyro_z_kurt = 0.0;
+		
+		for(int i=0;i<raw_data.length;i++){
+			high_g_x_skew_t += Math.pow(raw_data[i].high_g_x - high_g_x_mean, 3);
+			high_g_x_skew_b += Math.pow(raw_data[i].high_g_x - high_g_x_mean, 2);
+			high_g_y_skew_t += Math.pow(raw_data[i].high_g_y - high_g_y_mean, 3);
+			high_g_y_skew_b += Math.pow(raw_data[i].high_g_y - high_g_y_mean, 2);
+			high_g_z_skew_t += Math.pow(raw_data[i].high_g_z - high_g_z_mean, 3);
+			high_g_z_skew_b += Math.pow(raw_data[i].high_g_z - high_g_z_mean, 2);
+			
+			low_g_x_skew_t += Math.pow(raw_data[i].low_g_x - low_g_x_mean, 3);
+			low_g_x_skew_b += Math.pow(raw_data[i].low_g_x - low_g_x_mean, 2);
+			low_g_y_skew_t += Math.pow(raw_data[i].low_g_y - low_g_y_mean, 3);
+			low_g_y_skew_b += Math.pow(raw_data[i].low_g_y - low_g_y_mean, 2);
+			low_g_z_skew_t += Math.pow(raw_data[i].low_g_z - low_g_z_mean, 3);
+			low_g_z_skew_b += Math.pow(raw_data[i].low_g_z - low_g_z_mean, 2);
+			
+			gyro_x_skew_t += Math.pow(raw_data[i].gyro_x - gyro_x_mean, 3);
+			gyro_x_skew_b += Math.pow(raw_data[i].gyro_x - gyro_x_mean, 2);
+			gyro_y_skew_t += Math.pow(raw_data[i].gyro_y - gyro_y_mean, 3);
+			gyro_y_skew_b += Math.pow(raw_data[i].gyro_y - gyro_y_mean, 2);
+			gyro_z_skew_t += Math.pow(raw_data[i].gyro_z - gyro_z_mean, 3);
+			gyro_z_skew_b += Math.pow(raw_data[i].gyro_z - gyro_z_mean, 2);
+			
+			high_g_x_kurt_t += Math.pow(raw_data[i].high_g_x-high_g_x_mean, 4);
+			high_g_y_kurt_t += Math.pow(raw_data[i].high_g_y-high_g_y_mean, 4);
+			high_g_z_kurt_t += Math.pow(raw_data[i].high_g_z-high_g_z_mean, 4);
+			
+			low_g_x_kurt_t += Math.pow(raw_data[i].low_g_x-low_g_x_mean, 4);
+			low_g_y_kurt_t += Math.pow(raw_data[i].low_g_y-low_g_y_mean, 4);
+			low_g_z_kurt_t += Math.pow(raw_data[i].low_g_z-low_g_z_mean, 4);
+			
+			gyro_x_kurt_t += Math.pow(raw_data[i].gyro_x-gyro_x_mean, 4);
+			gyro_y_kurt_t += Math.pow(raw_data[i].gyro_y-gyro_y_mean, 4);
+			gyro_z_kurt_t += Math.pow(raw_data[i].gyro_z-gyro_z_mean, 4);
+			
+				
+		}
+
+		high_g_x_skew = (high_g_x_skew_t/count) / Math.pow(high_g_x_skew_b/(count-1.0), 1.5);
+		high_g_y_skew = (high_g_y_skew_t/count) / Math.pow(high_g_y_skew_b/(count-1.0), 1.5);
+		high_g_z_skew = (high_g_z_skew_t/count) / Math.pow(high_g_z_skew_b/(count-1.0), 1.5);
+		low_g_x_skew = (low_g_x_skew_t/count) / Math.pow(low_g_x_skew_b/(count-1.0), 1.5);
+		low_g_y_skew = (low_g_y_skew_t/count) / Math.pow(low_g_y_skew_b/(count-1.0), 1.5);
+		low_g_z_skew = (low_g_z_skew_t/count) / Math.pow(low_g_z_skew_b/(count-1.0), 1.5);
+		gyro_x_skew = (gyro_x_skew_t/count) / Math.pow(gyro_x_skew_b/(count-1.0), 1.5);
+		gyro_y_skew = (gyro_y_skew_t/count) / Math.pow(gyro_y_skew_b/(count-1.0), 1.5);
+		gyro_z_skew = (gyro_z_skew_t/count) / Math.pow(gyro_z_skew_b/(count-1.0), 1.5);
+		
+		high_g_x_kurt = (high_g_x_kurt_t/count) / Math.pow( (high_g_x_skew_b/(count-1.0)), 2 );
+		high_g_y_kurt = (high_g_y_kurt_t/count) / Math.pow( (high_g_y_skew_b/(count-1.0)), 2 );
+		high_g_z_kurt = (high_g_z_kurt_t/count) / Math.pow( (high_g_z_skew_b/(count-1.0)), 2 );
+		low_g_x_kurt  = (low_g_x_kurt_t/count)  / Math.pow( (low_g_x_skew_b/(count-1.0)) , 2 );
+		low_g_y_kurt  = (low_g_y_kurt_t/count)  / Math.pow( (low_g_y_skew_b/(count-1.0)) , 2 );
+		low_g_z_kurt  = (low_g_z_kurt_t/count)  / Math.pow( (low_g_z_skew_b/(count-1.0)) , 2 );
+		gyro_x_kurt   = (gyro_x_kurt_t/count)   / Math.pow( (gyro_x_skew_b/(count-1.0))  , 2 );
+		gyro_y_kurt   = (gyro_y_kurt_t/count)   / Math.pow( (gyro_y_skew_b/(count-1.0))  , 2 );
+		gyro_z_kurt   = (gyro_z_kurt_t/count)   / Math.pow( (gyro_z_skew_b/(count-1.0))  , 2 );
+
+		double [] ret = {high_g_x_mean,
+							high_g_y_mean,
+							high_g_z_mean,
+							low_g_x_mean,
+							low_g_y_mean,
+							low_g_z_mean,
+							gyro_x_mean,
+							gyro_y_mean,
+							gyro_z_mean,
+							high_g_x_var,
+							high_g_y_var,
+							high_g_z_var,
+							low_g_x_var,
+							low_g_y_var,
+							low_g_z_var,
+							gyro_x_var,
+							gyro_y_var,
+							gyro_z_var,
+							high_g_x_skew,
+							high_g_y_skew,
+							high_g_z_skew,
+							low_g_x_skew,
+							low_g_y_skew,
+							low_g_z_skew,
+							gyro_x_skew,
+							gyro_y_skew,
+							gyro_z_skew,
+							high_g_x_kurt,
+							high_g_y_kurt,
+							high_g_z_kurt,
+							low_g_x_kurt,
+							low_g_y_kurt,
+							low_g_z_kurt,
+							gyro_x_kurt,
+							gyro_y_kurt,
+							gyro_z_kurt};
+		return ret;
 	}
 	
 	public String toString(){

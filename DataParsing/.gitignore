@@ -12,3 +12,6 @@
 /.project
 /.classpath
 /.recommenders
+/GuiWindow.class
+/GuiWindow$1.class
+/Serial$2.class

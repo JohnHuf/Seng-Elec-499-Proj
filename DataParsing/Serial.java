@@ -1,3 +1,4 @@
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -23,6 +24,7 @@ public class Serial implements SerialPortEventListener {
 	boolean punchStart=false;
 	static String [] classes = {"uppercut","jab","hook","noise"};
 	String punchType="uppercut";
+	static GuiWindow window;
 	
 	int underCount=0;
 	int punchCount =0;
@@ -138,23 +140,34 @@ public class Serial implements SerialPortEventListener {
 						if(isPunch){
 							BleMessage[] punchArray = new BleMessage[ punchData.size() ];
 							punchData.toArray( punchArray );
-							punchOver=false;
 							Punch punch=new Punch(punchArray);
 							punch.isPunch=true;
 							System.out.println("PUNCH DETECTED");
-							System.out.println("SPEED : "+punch.getSpeed()+"m/s");
-							System.out.println("FORCE : "+punch.getForce()+"G");
-							punchCount++;
 							
-							PrintWriter writer = new PrintWriter("PunchData\\"+punchType+"\\"+punchType+"("+punchCount+").csv");
+							punch.fixTimes();
+						
+							window.setAccel(punch.getForce());
+							window.setSpeed(punch.getSpeed());
+							
+							window.setBgGreen();
+							punchCount++;
+							window.setCount(punchCount);
+							window.setClass("Punch");
+							
+	/*						PrintWriter writer = new PrintWriter("PunchData\\"+punchType+"\\"+punchType+"("+punchCount+").csv");
 							writer.print(punch);
-							writer.close();
+							writer.close();*/
 	
 							isPunch=false;
 							//Classify Punch Here or print it to a file
 						}
+						else{
+							window.setClass("No Punch");
+							window.setBgRed();
+						}
 						punchStart=false;
 						punchOver=false;
+						underCount=0;
 					}
 					if (msg.magnitude>10.0&&!punchStart){
 						punchStart=true;
@@ -167,7 +180,7 @@ public class Serial implements SerialPortEventListener {
 					
 				
 			} catch (Exception e) {
-				System.err.println(e.toString());
+				e.printStackTrace();
 			}
 		}
 		// Ignore all the other eventTypes, but you should consider the other ones.
@@ -274,27 +287,32 @@ public class Serial implements SerialPortEventListener {
 			System.out.println("IO Exception");
 		}
 	}
+	
 
 	public static void main(String[] args) throws Exception {
 		
 		Serial main = new Serial();
 		main.initialize();
-		
-		File dir = new File("PunchData\\"+main.punchType);
-		  File[] directoryListing = dir.listFiles();
-		  if (directoryListing != null) {
-		    for (File child : directoryListing) {
-		       main.punchCount++;
-		    }
-		  } 
-		Thread t=new Thread() {
+		  
+
+		Thread t2=new Thread() {
 			public void run() {
 				//the following line will keep this app alive for 1000 seconds,
 				//waiting for events to occur and responding to them (printing incoming messages to console).
-				try {Thread.sleep(1000000);} catch (InterruptedException ie) {}
+				try {
+					window = new GuiWindow();
+					window.getFrmBoxingMetricsDemo().setVisible(true);
+					window.setCount(0);
+					window.setClass("No Punch");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				try {Thread.sleep(1000000000);} catch (InterruptedException ie) {}
+				
 			}
 		};
-		t.start();
+		//t1.start();
+		t2.start();
 		System.out.println("Started");
 	}
 }
