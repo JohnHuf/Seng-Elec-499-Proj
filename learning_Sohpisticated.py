@@ -5,6 +5,8 @@
 # 4. It writes this data to the arff file, and adds the class each datum falls into
 # 5. This arff file can then be run through weka
 #
+# NOTES:
+
 
 # FORMAT FOR MINING
 out = open("punch_data.arff", "w")
@@ -174,33 +176,33 @@ for directory in directorynames:
 			# Find top and bottom skew chunks
 			high_g_x_skew_t += pow(( float(line2.split(',')[2]) - high_g_x_mean ),3)
 			high_g_x_skew_b += pow(( float(line2.split(',')[2]) - high_g_x_mean ),2)
-			high_g_y_skew_t += pow(( float(line2.split(',')[3]) - high_g_x_mean ),3)
-			high_g_y_skew_b += pow(( float(line2.split(',')[3]) - high_g_x_mean ),2)
-			high_g_z_skew_t += pow(( float(line2.split(',')[4]) - high_g_x_mean ),3)
-			high_g_z_skew_b += pow(( float(line2.split(',')[4]) - high_g_x_mean ),2)
-			low_g_x_skew_t  += pow(( float(line2.split(',')[5]) - high_g_x_mean ),3)
-			low_g_x_skew_b  += pow(( float(line2.split(',')[5]) - high_g_x_mean ),2)
-			low_g_y_skew_t  += pow(( float(line2.split(',')[6]) - high_g_x_mean ),3)
-			low_g_y_skew_b  += pow(( float(line2.split(',')[6]) - high_g_x_mean ),2)
-			low_g_z_skew_t  += pow(( float(line2.split(',')[7]) - high_g_x_mean ),3)
-			low_g_z_skew_b  += pow(( float(line2.split(',')[7]) - high_g_x_mean ),2)
-			gyro_x_skew_t   += pow(( float(line2.split(',')[8]) - high_g_x_mean ),3)
-			gyro_x_skew_b   += pow(( float(line2.split(',')[8]) - high_g_x_mean ),2)
-			gyro_y_skew_t   += pow(( float(line2.split(',')[9]) - high_g_x_mean ),3)
-			gyro_y_skew_b   += pow(( float(line2.split(',')[9]) - high_g_x_mean ),2)
-			gyro_z_skew_t   += pow(( float(line2.split(',')[10]) - high_g_x_mean ),3)
-			gyro_z_skew_b   += pow(( float(line2.split(',')[10]) - high_g_x_mean ),2)
+			high_g_y_skew_t += pow(( float(line2.split(',')[3]) - high_g_y_mean ),3)
+			high_g_y_skew_b += pow(( float(line2.split(',')[3]) - high_g_y_mean ),2)
+			high_g_z_skew_t += pow(( float(line2.split(',')[4]) - high_g_z_mean ),3)
+			high_g_z_skew_b += pow(( float(line2.split(',')[4]) - high_g_z_mean ),2)
+			low_g_x_skew_t  += pow(( float(line2.split(',')[5]) - low_g_x_mean ),3)
+			low_g_x_skew_b  += pow(( float(line2.split(',')[5]) - low_g_x_mean ),2)
+			low_g_y_skew_t  += pow(( float(line2.split(',')[6]) - low_g_y_mean ),3)
+			low_g_y_skew_b  += pow(( float(line2.split(',')[6]) - low_g_y_mean ),2)
+			low_g_z_skew_t  += pow(( float(line2.split(',')[7]) - low_g_z_mean ),3)
+			low_g_z_skew_b  += pow(( float(line2.split(',')[7]) - low_g_z_mean ),2)
+			gyro_x_skew_t   += pow(( float(line2.split(',')[8]) - gyro_x_mean ),3)
+			gyro_x_skew_b   += pow(( float(line2.split(',')[8]) - gyro_x_mean ),2)
+			gyro_y_skew_t   += pow(( float(line2.split(',')[9]) - gyro_y_mean ),3)
+			gyro_y_skew_b   += pow(( float(line2.split(',')[9]) - gyro_y_mean ),2)
+			gyro_z_skew_t   += pow(( float(line2.split(',')[10]) - gyro_z_mean ),3)
+			gyro_z_skew_b   += pow(( float(line2.split(',')[10]) - gyro_z_mean ),2)
 
 			# Find top kurtosis chunk (bottom is *_skew_b)
 			high_g_x_kurt_t += pow(( float(line2.split(',')[2]) - high_g_x_mean ),4)
-			high_g_y_kurt_t += pow(( float(line2.split(',')[3]) - high_g_x_mean ),4)
-			high_g_z_kurt_t += pow(( float(line2.split(',')[4]) - high_g_x_mean ),4)
-			low_g_x_kurt_t  += pow(( float(line2.split(',')[5]) - high_g_x_mean ),4)
-			low_g_y_kurt_t  += pow(( float(line2.split(',')[6]) - high_g_x_mean ),4)
-			low_g_z_kurt_t  += pow(( float(line2.split(',')[7]) - high_g_x_mean ),4)
-			gyro_x_kurt_t   += pow(( float(line2.split(',')[8]) - high_g_x_mean ),4)
-			gyro_y_kurt_t   += pow(( float(line2.split(',')[9]) - high_g_x_mean ),4)
-			gyro_z_kurt_t   += pow(( float(line2.split(',')[10]) - high_g_x_mean ),4)
+			high_g_y_kurt_t += pow(( float(line2.split(',')[3]) - high_g_y_mean ),4)
+			high_g_z_kurt_t += pow(( float(line2.split(',')[4]) - high_g_z_mean ),4)
+			low_g_x_kurt_t  += pow(( float(line2.split(',')[5]) - low_g_x_mean ),4)
+			low_g_y_kurt_t  += pow(( float(line2.split(',')[6]) - low_g_y_mean ),4)
+			low_g_z_kurt_t  += pow(( float(line2.split(',')[7]) - low_g_z_mean ),4)
+			gyro_x_kurt_t   += pow(( float(line2.split(',')[8]) - gyro_x_mean ),4)
+			gyro_y_kurt_t   += pow(( float(line2.split(',')[9]) - gyro_y_mean ),4)
+			gyro_z_kurt_t   += pow(( float(line2.split(',')[10]) - gyro_z_mean ),4)
 
 		# Finish skewness calculation
 		high_g_x_skew = 0.0
@@ -240,3 +242,4 @@ for directory in directorynames:
 		s = str(high_g_x_mean) +","+str(high_g_y_mean) +","+str(high_g_z_mean)+","+str(low_g_x_mean)  +","+str(low_g_y_mean)  +","+str(low_g_z_mean)+","+str(gyro_x_mean)   +","+str(gyro_y_mean)   +","+str(gyro_z_mean)+","+str(high_g_x_var)  +","+str(high_g_y_var)  +","+str(high_g_z_var)+","+str(low_g_x_var)   +","+str(low_g_y_var)   +","+str(low_g_z_var)+","+str(gyro_x_var)    +","+str(gyro_y_var)    +","+str(gyro_z_var) +","+str(high_g_x_skew) +","+str(high_g_y_skew) +","+str(high_g_z_skew)+","+str(low_g_x_skew)  +","+str(low_g_y_skew)  +","+str(low_g_z_skew)+","+str(gyro_x_skew)   +","+str(gyro_y_skew)   +","+str(gyro_z_skew)+","+str(high_g_x_kurt) +","+str(high_g_y_kurt) +","+str(high_g_z_kurt)+","+str(low_g_x_kurt)  +","+str(low_g_y_kurt)  +","+str(low_g_z_kurt)+","+str(gyro_x_kurt)   +","+str(gyro_y_kurt)   +","+str(gyro_z_kurt)+","+directory[12:-1]+"\n"
 
 		out.write(s)
+out.close()
