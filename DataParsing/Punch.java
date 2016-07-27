@@ -9,6 +9,7 @@ public class Punch{
 	static String [] classes = {"uppercut","jab","hook","noise"};
 	static String [] headers = {"uc","jab","hook","noise"};
 	
+	
 	BleMessage [] raw_data;
 	int speed;
 	boolean isPunch;
@@ -56,7 +57,8 @@ public class Punch{
 		double velz=0;
 		double speed=0;
 		
-		while(raw_data[i].low_g_x != -128 && i<raw_data.length-1){
+		while(raw_data[i].low_g_x != -128 && raw_data[i].magnitude <= 100) {
+			//&& (raw_data[i].low_g_x+6) >= 0)
 			xrad=rawToRad(raw_data[i].gyro_x);
 			yrad=rawToRad(raw_data[i].gyro_y);
 			zrad=rawToRad(raw_data[i].gyro_z);
@@ -68,9 +70,9 @@ public class Punch{
 			cosz=Math.cos(zrad);
 			sinz=Math.sin(zrad);
 			
-			accx=rawToMs2(raw_data[i].low_g_x);
-			accy=rawToMs2(raw_data[i].low_g_y);
-			accz=rawToMs2(raw_data[i].low_g_z);
+			accx=rawToMs2(raw_data[i].low_g_x+6);
+			accy=rawToMs2(raw_data[i].low_g_y-5);
+			accz=rawToMs2(raw_data[i].low_g_z+6);
 			
 			
 			
@@ -78,13 +80,16 @@ public class Punch{
 			accel[1]=accx*(cosy*sinz)+accy*(cosx*cosz+sinx*sinz*siny)+accz*(cosx*sinz*siny-cosz*sinx);
 			accel[2]=accx*(-1.0*siny)+accy*(cosy*sinx)+accz*(cosx*cosy);
 			accel[2]-=9.81;
-					
+	
 			acceleration.add(accel);
 			
 			if (i>0){
 				velx += (raw_data[i].time - raw_data[i-1].time)/1000.0 * ((acceleration.get(i)[0]+acceleration.get(i-1)[0])/2.0);
 				vely +=(raw_data[i].time - raw_data[i-1].time)/1000.0 * ((acceleration.get(i)[1]+acceleration.get(i-1)[1])/2.0);
 				velz += (raw_data[i].time - raw_data[i-1].time)/1000.0 * ((acceleration.get(i)[2]+acceleration.get(i-1)[2])/2.0);
+			}
+			if(i>=raw_data.length-2){
+				break;
 			}
 			i++;
 		}
@@ -117,7 +122,6 @@ public class Punch{
 		}
 		for (int i=1;i<raw_data.length;i++){
 			raw_data[i].time = time[i];
-			System.out.println(time[i]);
 		}
 		
 		
@@ -174,7 +178,6 @@ public class Punch{
 			gyro_x_mean +=raw_data[i].gyro_x;
 			gyro_y_mean +=raw_data[i].gyro_y;
 			gyro_z_mean +=raw_data[i].gyro_z;
-			
 			high_g_x_var +=  square(raw_data[i].high_g_x);
 			high_g_y_var += square(raw_data[i].high_g_x);
 			high_g_z_var += square(raw_data[i].high_g_x);
@@ -345,7 +348,8 @@ public class Punch{
 							low_g_z_kurt,
 							gyro_x_kurt,
 							gyro_y_kurt,
-							gyro_z_kurt};
+							gyro_z_kurt,
+							0};
 		return ret;
 	}
 	

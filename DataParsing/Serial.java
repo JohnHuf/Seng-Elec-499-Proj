@@ -22,9 +22,11 @@ public class Serial implements SerialPortEventListener {
 	List <BleMessage> punchData;
 	boolean punchOver=false;
 	boolean punchStart=false;
-	static String [] classes = {"uppercut","jab","hook","noise"};
-	String punchType="uppercut";
+	long start=0;
+	
+	
 	static GuiWindow window;
+	static Learning model;
 	
 	int underCount=0;
 	int punchCount =0;
@@ -111,10 +113,16 @@ public class Serial implements SerialPortEventListener {
 	 */
 	public synchronized void serialEvent(SerialPortEvent oEvent) {
 		if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+			
 			try {
-				
 				char [] inputLine = new char [13];
 				while(input.read(inputLine,0,13)==13){
+					
+					if(window !=null && System.currentTimeMillis()-start>=1000){
+						window.setBgRed();
+						start=0;
+					}
+					
 					BleMessage msg = new BleMessage(new String(inputLine).getBytes());
 					
 					//System.out.println(msg);
@@ -122,7 +130,6 @@ public class Serial implements SerialPortEventListener {
 						if(underCount>=70){
 							punchOver=true;
 						}	
-						
 						punchData.add(msg);
 						if (msg.magnitude<10.0){
 							underCount++;
@@ -135,6 +142,7 @@ public class Serial implements SerialPortEventListener {
 						if(msg.magnitude>70.0){
 							isPunch=true;
 						}
+						
 					}
 					if(punchStart&&punchOver){
 						if(isPunch){
@@ -145,26 +153,28 @@ public class Serial implements SerialPortEventListener {
 							System.out.println("PUNCH DETECTED");
 							
 							punch.fixTimes();
+							double [] features = punch.getFeatures();
+							String cls =model.getFit(features);
+							window.setClass(cls.substring(0, 1).toUpperCase() + cls.substring(1));
 						
 							window.setAccel(punch.getForce());
 							window.setSpeed(punch.getSpeed());
 							
+							
 							window.setBgGreen();
+							start=System.currentTimeMillis();
+							
 							punchCount++;
 							window.setCount(punchCount);
-							window.setClass("Punch");
-							
-	/*						PrintWriter writer = new PrintWriter("PunchData\\"+punchType+"\\"+punchType+"("+punchCount+").csv");
+							/*
+							PrintWriter writer = new PrintWriter("PunchData\\"+cls+"\\"+cls+"("+punchCount+").csv");
 							writer.print(punch);
-							writer.close();*/
-	
+							writer.close();
+	*/
 							isPunch=false;
 							//Classify Punch Here or print it to a file
 						}
-						else{
-							window.setClass("No Punch");
-							window.setBgRed();
-						}
+						
 						punchStart=false;
 						punchOver=false;
 						underCount=0;
@@ -300,6 +310,7 @@ public class Serial implements SerialPortEventListener {
 				//the following line will keep this app alive for 1000 seconds,
 				//waiting for events to occur and responding to them (printing incoming messages to console).
 				try {
+					model = new Learning();
 					window = new GuiWindow();
 					window.getFrmBoxingMetricsDemo().setVisible(true);
 					window.setCount(0);
@@ -307,7 +318,7 @@ public class Serial implements SerialPortEventListener {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				try {Thread.sleep(1000000000);} catch (InterruptedException ie) {}
+				try {Thread.sleep(2000000000);} catch (InterruptedException ie) {}
 				
 			}
 		};
